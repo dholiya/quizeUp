@@ -1,12 +1,10 @@
-import 'dart:collection';
-import 'dart:convert';
 import 'dart:core';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:quizup/TodaysQuiz/TodayQuizUp.dart';
-import 'package:quizup/model/home/homeModel.dart';
+import 'package:quizup/Util/ColorUtil.dart';
 
 // void main() => runApp(signIn());
 class home extends StatelessWidget {
@@ -129,12 +127,7 @@ class _homeState extends State<_home> {
 
     FirebaseFirestore _fireStoreDataBase = FirebaseFirestore.instance;
 
-    Stream<List<homeModel>> getUserList() {
-      return _fireStoreDataBase.collection('user').snapshots().map((snapShot) =>
-          snapShot.docs
-              .map((document) => homeModel.fromJson(document.data()))
-              .toList());
-    }
+
 
     final firestoreInstance = FirebaseFirestore.instance;
     firestoreInstance.collection("dashboard").get().then((querySnapshot) {
@@ -154,14 +147,58 @@ class _homeState extends State<_home> {
 
   _builditem(BuildContext context, DocumentSnapshot document) {
     return Card(
+      color: Color(ColorUtil.color_Primary),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      elevation: 2,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(document.id),
-          ListView.builder(
-            itemCount: document.data().length,
-            itemBuilder: (BuildContext context, int index) {
-              Text("")
-            },
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: Text(
+              document.id,
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.w400),
+            ),
+          ),
+          Container(
+            color: Color(ColorUtil.color_PrimaryLite),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: document.data().length,
+              itemBuilder: (BuildContext context, int index) {
+                List keys = [];
+                List values = [];
+                document.data().forEach((key, value) {
+                  keys.add(key);
+                  values.add(value.toString());
+                });
+                return Container(
+                    padding: EdgeInsets.all(10),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: RichText(
+                        text: TextSpan(
+                            text: keys[index].toString(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w400),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: " : "+values[index].toString(),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                      fontWeight: FontWeight.w500),
+                                  )
+                            ]),
+                      ),
+                    ));
+              },
+            ),
           )
         ],
       ),
