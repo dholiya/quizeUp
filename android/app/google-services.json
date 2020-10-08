@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "765865305897",
+    "firebase_url": "https://quizup-f9d49.firebaseio.com",
+    "project_id": "quizup-f9d49",
+    "storage_bucket": "quizup-f9d49.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:765865305897:android:5b7a29f73f4cae0f6a3938",
+        "android_client_info": {
+          "package_name": "com.rdbrain.quizup"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "765865305897-mbik7o9pijudev3rtinvnmviai5m1gpm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXK0FZkTSx_omJOWKU7r57zedHqs8KwQQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "765865305897-mbik7o9pijudev3rtinvnmviai5m1gpm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
