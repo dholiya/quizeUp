@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:quizup/SessionManager/UserSessionNdata.dart';
+import 'package:quizup/activity/WelcomePage.dart';
 import 'package:quizup/activity/home.dart';
 import 'package:quizup/auth/Login.dart';
-import 'package:quizup/auth/signIn.dart';
+import 'package:quizup/auth/otpPage.dart';
 
 import 'TodaysQuiz/TodayQuizUp.dart';
+import 'auth/name.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +18,12 @@ Future<void> main() async {
     debugShowCheckedModeBanner: false,
     home: SplashScreen(),
     routes: <String, WidgetBuilder>{
-      '/splash': (BuildContext context) => new SplashScreen(),
-      home.name: (BuildContext context) => new home(),
-      Login.name: (BuildContext context) => new Login(),
-      TodayQuizUp.name: (BuildContext context) => new TodayQuizUp(),
+      '/splash': (BuildContext context) => SplashScreen(),
+      home.name: (BuildContext context) => home(),
+      Login.name: (BuildContext context) => Login(),
+      TodayQuizUp.name: (BuildContext context) => TodayQuizUp(),
+      WelcomePage.name: (BuildContext context) => WelcomePage(""),
+      enterName.name: (BuildContext context) => enterName(),
     },
   ));
 }
@@ -37,27 +41,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> navigationPage() async {
     Session prefs = Session();
+
     Future<bool> authToken = prefs.getAuthToken();
     authToken.then((data) {
-
       if (data == true) {
-        print("data ${data.toString()}");
-        Navigator.of(context).pushReplacementNamed(home.name);
-
-        // Navigator.push(/
-        //     context, MaterialPageRoute(builder: (scaffoldContext) => home()));
+        Future<String> authName = prefs.getName();
+        authName.then((value) => {
+              if (value == null || value == "")
+                {
+                  print("authName $value"),
+                  Navigator.of(context).pushReplacementNamed(enterName.name)
+                }
+              else
+                {
+                  print("authName $value"),
+                  Navigator.of(context).pushReplacementNamed(home.name)
+                }
+            });
       } else {
         print("data ${data.toString()}");
         Navigator.of(context).pushReplacementNamed(Login.name);
-
-        // Navigator.push(
-        //     context, MaterialPageRoute(builder: (scaffoldContext) => Login()));
       }
     }, onError: (e) {
       print("data ${e.toString()}");
       Navigator.of(context).pushReplacementNamed(Login.name);
-      // Navigator.push(
-      //     context, MaterialPageRoute(builder: (scaffoldContext) => Login()));
     });
   }
 

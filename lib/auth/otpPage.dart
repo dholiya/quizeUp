@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_platform_interface/src/providers/phone_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,11 +8,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:quizup/SessionManager/UserSessionNdata.dart';
+import 'package:quizup/activity/WelcomePage.dart';
 import 'package:quizup/activity/home.dart';
+import 'package:quizup/auth/name.dart';
 
 // void main() => runApp(signIn());
 class signIn extends StatelessWidget {
-  static String name = "/signIn";
+  static String name = "/otppage";
 
   String smsCod;
   String number;
@@ -40,7 +43,6 @@ class signIn extends StatelessWidget {
 class _signIn extends StatefulWidget {
   String smsCod;
   String number;
-
   PhoneAuthCredential credential;
 
   _signIn(this.smsCod, this.number, this.credential);
@@ -188,7 +190,7 @@ class _signInState extends State<_signIn> {
                     style: TextStyle(color: Colors.black54, fontSize: 15),
                     children: [
                       TextSpan(
-                          text: " RESEND",
+                          text: "RESEND",
                           recognizer: onTapRecognizer,
                           style: TextStyle(
                               color: Color(0xFF91D3B3),
@@ -202,6 +204,19 @@ class _signInState extends State<_signIn> {
               Container(
                 margin:
                     const EdgeInsets.symmetric(vertical: 16.0, horizontal: 30),
+                decoration: BoxDecoration(
+                    color: Colors.green.shade300,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.green.shade200,
+                          offset: Offset(1, -2),
+                          blurRadius: 5),
+                      BoxShadow(
+                          color: Colors.green.shade200,
+                          offset: Offset(-1, 2),
+                          blurRadius: 5)
+                    ]),
                 child: ButtonTheme(
                   height: 50,
                   child: FlatButton(
@@ -217,22 +232,20 @@ class _signInState extends State<_signIn> {
                         });
                       } else if (currentText == widget.smsCod) {
                         setState(() {
-
                           hasError = false;
-                          FirebaseAuth.instance.signInWithCredential(widget.credential);
+                          FirebaseAuth.instance
+                              .signInWithCredential(widget.credential);
 
                           Session prefs = Session();
                           prefs.setAuthToken(true);
+                          prefs.setmoNumber(widget.number);
 
                           scaffoldKey.currentState.showSnackBar(SnackBar(
                             content: Text("Welcome!!"),
                             duration: Duration(seconds: 2),
                           ));
-
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (scaffoldContext) => home()));
-
                         });
+                        checkRecord(widget.number, context);
                       } else {
                         scaffoldKey.currentState.showSnackBar(SnackBar(
                           content: Text("Please enter correct OTP"),
@@ -250,19 +263,6 @@ class _signInState extends State<_signIn> {
                     )),
                   ),
                 ),
-                decoration: BoxDecoration(
-                    color: Colors.green.shade300,
-                    borderRadius: BorderRadius.circular(5),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.green.shade200,
-                          offset: Offset(1, -2),
-                          blurRadius: 5),
-                      BoxShadow(
-                          color: Colors.green.shade200,
-                          offset: Offset(-1, 2),
-                          blurRadius: 5)
-                    ]),
               ),
             ],
           ),
@@ -286,5 +286,35 @@ class _signInState extends State<_signIn> {
       };
     errorController = StreamController<ErrorAnimationType>();
     super.initState();
+  }
+
+  void checkRecord(String numebr, BuildContext context) async {
+    final databaseReference = FirebaseFirestore.instance;
+    await databaseReference
+        .collection("userrecord")
+        .doc(numebr)
+        .get()
+        .then((docSnapshot) async {
+      if (docSnapshot.exists) {
+        print("userrecora${docSnapshot.data()["name"]}");
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (scaffoldContext) =>
+                    WelcomePage(docSnapshot.data()["name"])));
+      } else {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (scaffoldContext) => enterName()));
+        // final databaseReference = FirebaseFirestore.instance;
+        // await databaseReference
+        //     .collection("dashboard")
+        //     .doc(uniquename)
+        //     .set({'total': 10, 'last quize': 2}).whenComplete(
+        //         () => {print("printkaro : completed")});
+        // setState(() {
+        //   _state = 2;
+        // });
+      }
+    });
   }
 }

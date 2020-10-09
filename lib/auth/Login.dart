@@ -7,7 +7,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'file:///D:/flutter/firebase/quizup/lib/auth/signIn.dart';
+import 'package:quizup/Util/testData.dart';
+import 'file:///D:/flutter/firebase/quizup/lib/auth/otpPage.dart';
 import 'SocialLogin.dart';
 
 class Login extends StatelessWidget {
@@ -182,7 +183,7 @@ class _LoginState extends State<MyLogin> {
                                 codeSent:
                                     (String verificationId, int resendToken) {
                                   print(
-                                      "fdvm verificationId: ${resendToken}:${verificationId}");
+                                      "fdvm verificationId: ${resendToken} = ${verificationId}");
                                   setState(() {
                                     VISIVILITY_OTP = false;
                                   });
@@ -254,7 +255,7 @@ class _LoginState extends State<MyLogin> {
                       timeout: Duration(seconds: 10),
                       codeSent: (String verificationId, int resendToken) {
                         print(
-                            "fdvm verificationId: ${resendToken}:${verificationId}");
+                            "fdvm verificationId: ${resendToken} = ${verificationId}");
                         setState(() {
                           VISIVILITY_OTP = false;
                         });
@@ -303,8 +304,8 @@ class _LoginState extends State<MyLogin> {
                     Navigator.push(
                       scaffoldContext,
                       MaterialPageRoute(
-                          builder: (scaffoldContext) =>
-                              signIn("654321", "+911234567980", abc)),
+                          builder: (scaffoldContext) => signIn(
+                              testData.test_opt, testData.test_mobile, abc)),
                     );
                     // });
                   },

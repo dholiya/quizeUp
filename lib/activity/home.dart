@@ -3,8 +3,12 @@ import 'dart:core';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:quizup/SessionManager/UserSessionNdata.dart';
 import 'package:quizup/TodaysQuiz/TodayQuizUp.dart';
 import 'package:quizup/Util/ColorUtil.dart';
+import 'package:quizup/auth/Login.dart';
+
+import 'deshbord.dart';
 
 // void main() => runApp(signIn());
 class home extends StatelessWidget {
@@ -30,8 +34,6 @@ class _home extends StatefulWidget {
 
 class _homeState extends State<_home> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-  List userScore = [];
-  List alldatawithnumber = [];
 
   @override
   initState() {
@@ -45,20 +47,7 @@ class _homeState extends State<_home> {
         key: _scaffoldKey,
         appBar: _appBar(),
         drawer: _drawer(),
-        body: StreamBuilder(
-          stream:
-              FirebaseFirestore.instance.collection('dashboard').snapshots(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return ListView.builder(
-                itemCount: snapshot.data.documents.length,
-                itemBuilder: (BuildContext context, int index) =>
-                    _builditem(context, snapshot.data.documents[index]),
-              );
-            } else {
-              return Center(child: CircularProgressIndicator());
-            }
-          },
+        body: Container(
         ),
       ),
     );
@@ -73,14 +62,32 @@ class _homeState extends State<_home> {
           ListTile(
             title: Text('Today\'s QuizUp'),
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => TodayQuizUp()));
-              // Navigator.pushNamed(context, TodayQuizUp.name);
+              // Navigator.push(context,
+              //     MaterialPageRoute(builder: (context) => TodayQuizUp()));
+              Navigator.pushNamed(context, TodayQuizUp.name);
             },
           ),
           ListTile(
             title: Text('Dashboard'),
-            onTap: () {},
+            onTap: () {
+              setState(() {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) => new deshbord()));
+              });
+            },
+          ),
+          ListTile(
+            title: Text('Logout'),
+            onTap: () {
+              Session prefs = Session();
+              prefs.setAuthToken(false);
+              prefs.setmoNumber("");
+              prefs.setName("");
+              setState(() {
+                Navigator.push(context,
+                    new MaterialPageRoute(builder: (context) => new Login()));
+              });
+            },
           ),
         ],
       ),
@@ -89,7 +96,7 @@ class _homeState extends State<_home> {
 
   _appBar() {
     return AppBar(
-      title: Text("Home"),
+      title: Text("QuizUp"),
       leading: new IconButton(
         onPressed: () {
           _scaffoldKey.currentState.openDrawer();
@@ -121,87 +128,4 @@ class _homeState extends State<_home> {
         ));
   }
 
-  void funtion() {
-    userScore.clear();
-    alldatawithnumber.clear();
-
-    FirebaseFirestore _fireStoreDataBase = FirebaseFirestore.instance;
-
-
-
-    final firestoreInstance = FirebaseFirestore.instance;
-    firestoreInstance.collection("dashboard").get().then((querySnapshot) {
-      querySnapshot.docs.forEach((result) {
-        Map hashMap = new Map<String, dynamic>.from(result.data());
-        hashMap.forEach((key, value) {
-          var tempscore = {
-            "\"" + key + "\"": value,
-          };
-          userScore.add(tempscore);
-        });
-        alldatawithnumber.add({"\"" + result.id + "\"": userScore});
-      });
-      print("dashboard ${alldatawithnumber}");
-    });
-  }
-
-  _builditem(BuildContext context, DocumentSnapshot document) {
-    return Card(
-      color: Color(ColorUtil.color_Primary),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 2,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(
-              document.id,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w400),
-            ),
-          ),
-          Container(
-            color: Color(ColorUtil.color_PrimaryLite),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: document.data().length,
-              itemBuilder: (BuildContext context, int index) {
-                List keys = [];
-                List values = [];
-                document.data().forEach((key, value) {
-                  keys.add(key);
-                  values.add(value.toString());
-                });
-                return Container(
-                    padding: EdgeInsets.all(10),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: RichText(
-                        text: TextSpan(
-                            text: keys[index].toString(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 22,
-                                fontWeight: FontWeight.w400),
-                            children: <TextSpan>[
-                              TextSpan(
-                                  text: " : "+values[index].toString(),
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                      fontWeight: FontWeight.w500),
-                                  )
-                            ]),
-                      ),
-                    ));
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
 }
